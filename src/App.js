@@ -13,13 +13,39 @@ function App() {
 
   useEffect(() => {
     userService.getAll()
-      .then(users => {
-        setUsers(users);
-      })
+      .then(setUsers)
       .catch(err => {
         console.log('Error' + err);
       });
   }, []);
+
+  const onUserCreateSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData);
+
+    const createdUser = await userService.create(data);
+
+    setUsers(state => [...state, createdUser]);
+  }
+
+  const onUserUpdateSubmit = async (e, userId) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData);
+
+    const updatedUser = await userService.update(userId, data);
+
+    setUsers(state => state.map(x => x._id === userId ? updatedUser : x));
+  };
+
+  const onUserDelete = async (userId) => {
+    await userService.remove(userId);
+
+    setUsers(state => state.filter(x => x._id !== userId));
+  };
 
   return (
     <>
@@ -28,9 +54,13 @@ function App() {
       <main className="main">
         <section className="card users-container">
           <Search />
-          <UserList users={users}/>
 
-          <button className="btn-add btn">Add new user</button>
+          <UserList
+            users={users}
+            onUserCreateSubmit={onUserCreateSubmit}
+            onUserUpdateSubmit={onUserUpdateSubmit}
+            onUserDelete={onUserDelete}
+          />
         </section>
       </main>
 

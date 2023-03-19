@@ -10,7 +10,7 @@ export const UserDetails = ({
   updatedAt,
   phoneNumber,
   address,
-  onClose
+  onClose,
 }) => {
   return (
     <div className="overlay">
